@@ -2193,9 +2193,11 @@ static void binder_cleanup_transaction(struct binder_transaction *t,
 		binder_send_failed_reply(t, error_code);
 	} else {
 		binder_debug(BINDER_DEBUG_DEAD_TRANSACTION,
-			"undelivered transaction %d, %s\n",
-			t->debug_id, reason);
-		binder_free_transaction(t);
+			"binder: undelivered transaction %d\n",
+			t->debug_id);
+		t->buffer->transaction = NULL;
+		kfree(t);
+		binder_stats_deleted(BINDER_STAT_TRANSACTION);
 	}
 }
 
