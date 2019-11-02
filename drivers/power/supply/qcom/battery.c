@@ -820,17 +820,6 @@ out:
 	vote(chip->pl_awake_votable, FCC_STEPPER_VOTER, false, 0);
 }
 
-static bool is_batt_available(struct pl_data *chip)
-{
-	if (!chip->batt_psy)
-		chip->batt_psy = power_supply_get_by_name("battery");
-
-	if (!chip->batt_psy)
-		return false;
-
-	return true;
-}
-
 #define PARALLEL_FLOAT_VOLTAGE_DELTA_UV 50000
 static int pl_fv_vote_callback(struct votable *votable, void *data,
 			int fv_uv, const char *client)
@@ -992,6 +981,17 @@ static bool is_main_available(struct pl_data *chip)
 	chip->main_psy = power_supply_get_by_name("main");
 
 	return !!chip->main_psy;
+}
+
+static bool is_batt_available(struct pl_data *chip)
+{
+	if (!chip->batt_psy)
+		chip->batt_psy = power_supply_get_by_name("battery");
+
+	if (!chip->batt_psy)
+		return false;
+
+	return true;
 }
 
 static int pl_disable_vote_callback(struct votable *votable,

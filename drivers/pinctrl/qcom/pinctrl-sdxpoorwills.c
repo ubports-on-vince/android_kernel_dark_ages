@@ -457,7 +457,6 @@ enum sdxpoorwills_functions {
 	msm_mux_dbg_out,
 	msm_mux_gcc_plltest,
 	msm_mux_emac_pps,
-	msm_mux_gps_ext_aggressor,
 	msm_mux_NA,
 };
 
@@ -838,10 +837,6 @@ static const char * const emac_pps_groups[] = {
 	"gpio89",
 };
 
-static const char * const gps_ext_aggressor_groups[] = {
-	"gpio42",
-};
-
 static const struct msm_function sdxpoorwills_functions[] = {
 	FUNCTION(uim2_data),
 	FUNCTION(gpio),
@@ -961,7 +956,6 @@ static const struct msm_function sdxpoorwills_functions[] = {
 	FUNCTION(dbg_out),
 	FUNCTION(gcc_plltest),
 	FUNCTION(emac_pps),
-	FUNCTION(gps_ext_aggressor),
 };
 
 /* Every pin is maintained as a single group, and missing or non-existing pin

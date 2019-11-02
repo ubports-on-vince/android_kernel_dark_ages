@@ -1526,6 +1526,10 @@ static void gsi_set_clear_dbell(struct usb_ep *ep,
 static bool gsi_check_ready_to_suspend(struct dwc3_msm *mdwc)
 {
 	u32	timeout = 500;
+	u32	reg = 0;
+	struct dwc3_ep *dep = to_dwc3_ep(ep);
+	struct dwc3 *dwc = dep->dwc;
+	struct dwc3_msm *mdwc = dev_get_drvdata(dwc->dev->parent);
 
 	while (dwc3_msm_read_reg_field(mdwc->base,
 		GSI_IF_STS, GSI_WR_CTRL_STATE_MASK)) {
@@ -1535,6 +1539,14 @@ static bool gsi_check_ready_to_suspend(struct dwc3_msm *mdwc)
 			return false;
 		}
 		usleep_range(20, 22);
+	}
+	/* Check for U3 only if we are not handling Function Suspend */
+	if (!f_suspend) {
+		reg = dwc3_readl(dwc->regs, DWC3_DSTS);
+		if (DWC3_DSTS_USBLNKST(reg) != DWC3_LINK_STATE_U3) {
+			dev_err(mdwc->dev, "Unable to suspend GSI ch\n");
+			return false;
+		}
 	}
 
 	return true;

@@ -87,8 +87,6 @@ static bool scm_dload_supported;
 static struct kobject dload_kobj;
 static void *dload_type_addr;
 
-static bool force_warm_reboot;
-
 static int dload_set(const char *val, const struct kernel_param *kp);
 /* interface for exporting attributes */
 struct reset_attribute {
@@ -219,10 +217,12 @@ static void set_dload_mode(int on)
 	return;
 }
 
+#if 0
 static void enable_emergency_dload_mode(void)
 {
 	pr_err("dload mode is not enabled on target\n");
 }
+#endif
 
 static bool get_dload_mode(void)
 {
@@ -304,8 +304,9 @@ static void msm_restart_prepare(const char *cmd)
 				(cmd != NULL && cmd[0] != '\0'));
 	}
 
-	if (force_warm_reboot)
-		pr_info("Forcing a warm reset of the system\n");
+#ifdef CONFIG_MSM_PRESERVE_MEM
+	need_warm_reset = true;
+#endif
 
 	/* Hard reset the PMIC unless memory contents must be maintained. */
 	if (force_warm_reboot || need_warm_reset)
@@ -363,8 +364,10 @@ static void msm_restart_prepare(const char *cmd)
 				__raw_writel(0x6f656d00 | (code & 0xff),
 					     restart_reason);
 			}
+#ifdef CONFIG_QCOM_DLOAD_MODE
 		} else if (!strncmp(cmd, "edl", 3)) {
 			enable_emergency_dload_mode();
+#endif
 		} else {
 			__raw_writel(0x77665501, restart_reason);
 		}

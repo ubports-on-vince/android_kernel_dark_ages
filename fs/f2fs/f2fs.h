@@ -3728,20 +3728,23 @@ static inline bool f2fs_force_buffered_io(struct inode *inode,
 }
 
 static inline bool f2fs_may_encrypt_bio(struct inode *inode,
-		struct f2fs_io_info *fio)
+                struct f2fs_io_info *fio)
 {
-	if (fio && (fio->type != DATA || fio->encrypted_page))
-		return false;
+     	if (fio && (fio->type != DATA || fio->encrypted_page))
+                return false;
 
-	return (f2fs_encrypted_file(inode) &&
-			fscrypt_using_hardware_encryption(inode));
+        return (f2fs_encrypted_file(inode) &&
+                        fscrypt_using_hardware_encryption(inode));
 }
+
 
 #ifdef CONFIG_F2FS_FAULT_INJECTION
 extern void f2fs_build_fault_attr(struct f2fs_sb_info *sbi, unsigned int rate,
 							unsigned int type);
 #else
 #define f2fs_build_fault_attr(sbi, rate, type)		do { } while (0)
+#endif
+
 #endif
 
 static inline bool is_journalled_quota(struct f2fs_sb_info *sbi)

@@ -1458,9 +1458,8 @@ static int __cam_isp_ctx_flush_req_in_top_state(
 	}
 
 end:
-	ctx_isp->substate_activated = CAM_ISP_CTX_ACTIVATED_SOF;
-	CAM_DBG(CAM_ISP, "ctx id:%d Flush request in top state %d",
-		 ctx->ctx_id, ctx->state);
+	CAM_DBG(CAM_ISP, "Flush request in top state %d",
+		 ctx->state);
 	return rc;
 }
 

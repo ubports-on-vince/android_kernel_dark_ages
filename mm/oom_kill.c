@@ -238,7 +238,7 @@ static enum oom_constraint constrained_alloc(struct oom_control *oc)
 	}
 
 	/* Default to all available memory */
-	oc->totalpages = totalram_pages + total_swap_pages;
+	oc->totalpages = totalram_pages() + total_swap_pages;
 
 	if (!IS_ENABLED(CONFIG_NUMA))
 		return CONSTRAINT_NONE;
@@ -615,14 +615,11 @@ void wake_oom_reaper(struct task_struct *tsk)
 	if (!oom_reaper_th)
 		return;
 
-	/*
-	 * Move the lock here to avoid scenario of queuing
-	 * the same task by both OOM killer and any other SIGKILL
-	 * path.
+	/* move the lock here to avoid scenario of queuing
+	 * the same task by both OOM killer and LMK.
 	 */
 	spin_lock(&oom_reaper_lock);
-
-	/* mm is already queued? */
+	/* tsk is already queued? */
 	if (test_and_set_bit(MMF_OOM_REAP_QUEUED, &tsk->signal->oom_mm->flags)) {
 		spin_unlock(&oom_reaper_lock);
 		return;

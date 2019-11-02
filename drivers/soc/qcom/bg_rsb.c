@@ -138,8 +138,6 @@ struct bgrsb_priv {
 	bool is_calibrd;
 
 	bool is_cnfgrd;
-	bool blk_rsb_cmnds;
-	bool pending_enable;
 };
 
 static void *bgrsb_drv;
@@ -424,7 +422,6 @@ static void bgrsb_bgdown_work(struct work_struct *work)
 	}
 
 	dev->is_cnfgrd = false;
-	dev->blk_rsb_cmnds = false;
 	pr_info("RSB current state is : %d\n", dev->bgrsb_current_state);
 
 	if (dev->bgrsb_current_state == BGRSB_STATE_INIT) {
@@ -468,8 +465,6 @@ static void bgrsb_glink_bgdown_work(struct work_struct *work)
 	}
 
 	dev->is_cnfgrd = false;
-	if (is_in_twm)
-		dev->blk_rsb_cmnds = true;
 
 	if (dev->handle)
 		glink_close(dev->handle);
@@ -693,13 +688,8 @@ static void bgrsb_enable_rsb(struct work_struct *work)
 								rsb_up_work);
 
 	mutex_lock(&dev->rsb_state_mutex);
-	if (dev->bgrsb_current_state == BGRSB_STATE_RSB_ENABLED) {
-		pr_debug("RSB is already enabled\n");
-		goto unlock;
-	}
 	if (dev->bgrsb_current_state != BGRSB_STATE_RSB_CONFIGURED) {
 		pr_err("BG is not yet configured for RSB\n");
-		dev->pending_enable = true;
 		goto unlock;
 	}
 
@@ -733,7 +723,6 @@ static void bgrsb_disable_rsb(struct work_struct *work)
 								rsb_down_work);
 
 	mutex_lock(&dev->rsb_state_mutex);
-	dev->pending_enable = false;
 	if (dev->bgrsb_current_state == BGRSB_STATE_RSB_ENABLED) {
 
 		rc = bgrsb_enable(dev, false);
@@ -761,11 +750,9 @@ static void bgrsb_calibration(struct work_struct *work)
 			container_of(work, struct bgrsb_priv,
 							rsb_calibration_work);
 
-	mutex_lock(&dev->rsb_state_mutex);
-
 	if (!dev->is_cnfgrd) {
 		pr_err("RSB is not configured\n");
-		goto unlock;
+		return;
 	}
 
 	req.cmd_id = 0x03;
@@ -800,10 +787,9 @@ static void bgrsb_buttn_configration(struct work_struct *work)
 			container_of(work, struct bgrsb_priv,
 							bttn_configr_work);
 
-	mutex_lock(&dev->rsb_state_mutex);
 	if (!dev->is_cnfgrd) {
 		pr_err("RSB is not configured\n");
-		goto unlock;
+		return;
 	}
 
 	req.cmd_id = 0x05;

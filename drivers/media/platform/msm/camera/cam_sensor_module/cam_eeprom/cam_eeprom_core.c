@@ -439,9 +439,7 @@ static int32_t cam_eeprom_parse_memory_map(
 	else if (cmm_hdr->cmd_type == CAMERA_SENSOR_CMD_TYPE_WAIT)
 		validate_size = sizeof(struct cam_cmd_unconditional_wait);
 
-	if (remain_buf_len < validate_size ||
-	    *num_map >= (MSM_EEPROM_MAX_MEM_MAP_CNT *
-		MSM_EEPROM_MEMORY_MAP_MAX_SIZE)) {
+	if (remain_buf_len < validate_size) {
 		CAM_ERR(CAM_EEPROM, "not enough buffer");
 		return -EINVAL;
 	}

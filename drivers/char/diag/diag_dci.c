@@ -3158,9 +3158,6 @@ int diag_dci_deinit_client(struct diag_dci_client_tbl *entry)
 		return DIAG_DCI_NO_REG;
 	driver->num_dci_client--;
 	driver->dci_client_id[entry->client_info.client_id - 1] = 0;
-
-	put_task_struct(entry->client);
-	entry->client = NULL;
 	/*
 	 * Clear the client's log and event masks, update the cumulative
 	 * masks and send the masks to peripherals

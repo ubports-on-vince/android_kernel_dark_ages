@@ -241,7 +241,6 @@ struct qpnp_lcdb {
 	bool				lcdb_enabled;
 	bool				settings_saved;
 	bool				lcdb_sc_disable;
-	bool				secure_mode;
 	bool				voltage_step_ramp;
 	int				sc_count;
 	ktime_t				sc_module_enable_time;
@@ -1378,9 +1377,6 @@ static int qpnp_lcdb_ldo_regulator_set_voltage(struct regulator_dev *rdev,
 	int rc = 0;
 	struct qpnp_lcdb *lcdb  = rdev_get_drvdata(rdev);
 
-	if (lcdb->secure_mode)
-		return 0;
-
 	lcdb->ldo.voltage_mv = min_uV / 1000;
 	if (lcdb->voltage_step_ramp)
 		rc = qpnp_lcdb_set_voltage_step(lcdb,
@@ -1465,9 +1461,6 @@ static int qpnp_lcdb_ncp_regulator_set_voltage(struct regulator_dev *rdev,
 {
 	int rc = 0;
 	struct qpnp_lcdb *lcdb  = rdev_get_drvdata(rdev);
-
-	if (lcdb->secure_mode)
-		return 0;
 
 	lcdb->ncp.voltage_mv = min_uV / 1000;
 	if (lcdb->voltage_step_ramp)
@@ -2243,24 +2236,7 @@ static int qpnp_lcdb_parse_dt(struct qpnp_lcdb *lcdb)
 	lcdb->voltage_step_ramp =
 			of_property_read_bool(node, "qcom,voltage-step-ramp");
 
-	lcdb->pwrdn_delay_ms = -EINVAL;
-	rc = of_property_read_u32(node, "qcom,pwrdn-delay-ms", &tmp);
-	if (!rc) {
-		if (!is_between(tmp, PWRDN_DELAY_MIN_MS, PWRDN_DELAY_MAX_MS)) {
-			pr_err("Invalid PWRDN_DLY val %d (min=%d max=%d)\n",
-				tmp, PWRDN_DELAY_MIN_MS, PWRDN_DELAY_MAX_MS);
-			return -EINVAL;
-		}
-
-		for (i = 0; i < ARRAY_SIZE(pwrup_pwrdn_ms); i++) {
-			if (tmp == pwrup_pwrdn_ms[i]) {
-				lcdb->pwrdn_delay_ms = i;
-				break;
-			}
-		}
-	}
-
-	return 0;
+	return rc;
 }
 
 static ssize_t qpnp_lcdb_irq_control(struct class *c,

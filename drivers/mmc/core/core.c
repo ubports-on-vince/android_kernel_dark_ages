@@ -643,7 +643,7 @@ void mmc_deferred_scaling(struct mmc_host *host, unsigned long timeout)
 				target_freq, current->comm);
 
 	err = mmc_clk_update_freq(host, target_freq,
-		clk_scaling.state, timeout);
+		host->clk_scaling.state, timeout);
 	if (err && err != -EAGAIN) {
 		pr_err("%s: failed on deferred scale clocks (%d)\n",
 			mmc_hostname(host), err);

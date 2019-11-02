@@ -5611,7 +5611,6 @@ static int fg_parse_dt(struct fg_chip *chip)
 
 	chip->dt.disable_esr_pull_dn = of_property_read_bool(node,
 					"qcom,fg-disable-esr-pull-dn");
-
 	chip->dt.disable_fg_twm = of_property_read_bool(node,
 					"qcom,fg-disable-in-twm");
 

@@ -77,7 +77,7 @@ module_param(qmi_timeout, ulong, 0600);
 
 #define ICNSS_MAX_PROBE_CNT		2
 
-#define PROBE_TIMEOUT			15000
+#define PROBE_TIMEOUT			5000
 
 #define icnss_ipc_log_string(_x...) do {				\
 	if (icnss_ipc_log_context)					\
@@ -292,8 +292,6 @@ enum icnss_driver_state {
 	ICNSS_REJUVENATE,
 	ICNSS_MODE_ON,
 	ICNSS_BLOCK_SHUTDOWN,
-	ICNSS_PDR,
-	ICNSS_MODEM_CRASHED,
 };
 
 struct ce_irq_list {
@@ -484,10 +482,6 @@ static struct icnss_priv {
 	uint32_t fw_error_fatal_irq;
 	uint32_t fw_early_crash_irq;
 	struct completion unblock_shutdown;
-	bool is_ssr;
-	struct thermal_cooling_device *tcdev;
-	unsigned long curr_thermal_state;
-	unsigned long max_thermal_state;
 } *penv;
 
 #ifdef CONFIG_ICNSS_DEBUG
@@ -1402,7 +1396,7 @@ static int wlfw_msa_mem_info_send_sync_msg(void)
 	for (i = 0; i < resp.mem_region_info_len; i++) {
 
 		if (resp.mem_region_info[i].size > penv->msa_mem_size ||
-		    resp.mem_region_info[i].region_addr >= max_mapped_addr ||
+		    resp.mem_region_info[i].region_addr > max_mapped_addr ||
 		    resp.mem_region_info[i].region_addr < penv->msa_pa ||
 		    resp.mem_region_info[i].size +
 		    resp.mem_region_info[i].region_addr > max_mapped_addr) {
@@ -2918,16 +2912,11 @@ static int icnss_modem_notifier_nb(struct notifier_block *nb,
 	if (code != SUBSYS_BEFORE_SHUTDOWN)
 		return NOTIFY_OK;
 
-	priv->is_ssr = true;
-
-	if (notif->crashed)
-		set_bit(ICNSS_MODEM_CRASHED, &priv->state);
-
 	if (code == SUBSYS_BEFORE_SHUTDOWN && !notif->crashed &&
 	    test_bit(ICNSS_BLOCK_SHUTDOWN, &priv->state)) {
 		if (!wait_for_completion_timeout(&priv->unblock_shutdown,
-				msecs_to_jiffies(PROBE_TIMEOUT)))
-			icnss_pr_err("modem block shutdown timeout\n");
+						 PROBE_TIMEOUT))
+			icnss_pr_err("wlan driver probe timeout\n");
 	}
 
 	if (test_bit(ICNSS_PDR_REGISTERED, &priv->state)) {
@@ -4342,13 +4331,6 @@ static int icnss_stats_show_state(struct seq_file *s, struct icnss_priv *priv)
 			continue;
 		case ICNSS_BLOCK_SHUTDOWN:
 			seq_puts(s, "BLOCK SHUTDOWN");
-			continue;
-		case ICNSS_PDR:
-			seq_puts(s, "PDR TRIGGERED");
-			continue;
-		case ICNSS_MODEM_CRASHED:
-			seq_puts(s, "MODEM CRASHED");
-			continue;
 		}
 
 		seq_printf(s, "UNKNOWN-%d", i);

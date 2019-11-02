@@ -172,7 +172,7 @@
 
 			cdc-vdda-cp-supply = <&pm8916_s4>;
 			qcom,cdc-vdda-cp-voltage = <1800000 2100000>;
-			qcom,cdc-vdda-cp-current = <770000>;
+			qcom,cdc-vdda-cp-current = <1800000>;
 
 			cdc-vdd-io-supply = <&pm8916_l5>;
 			qcom,cdc-vdd-io-voltage = <1800000 1800000>;
@@ -180,7 +180,7 @@
 
 			cdc-vdd-pa-supply = <&pm8916_s4>;
 			qcom,cdc-vdd-pa-voltage = <1800000 2100000>;
-			qcom,cdc-vdd-pa-current = <5000>;
+			qcom,cdc-vdd-pa-current = <1800000>;
 
 			cdc-vdd-mic-bias-supply = <&pm8916_l13>;
 			qcom,cdc-vdd-mic-bias-voltage = <3075000 3075000>;
@@ -297,76 +297,6 @@
 		pinctrl-names = "aud_active", "aud_sleep";
 		pinctrl-0 = <&cdc_pdm_lines_act>;
 		pinctrl-1 = <&cdc_pdm_lines_sus>;
-	};
-	thermal-zones {
-		xo-therm-buf-adc {
-			polling-delay-passive = <0>;
-			polling-delay = <0>;
-			thermal-sensors = <&pm8916_vadc 0x3c>;
-			thermal-governor = "user_space";
-
-			trips {
-				active-config0 {
-					temperature = <65000>;
-					hysteresis = <1000>;
-					type = "passive";
-				};
-			};
-		};
-
-		xo-therm-adc {
-			polling-delay-passive = <0>;
-			polling-delay = <0>;
-			thermal-sensors = <&pm8916_vadc 0x32>;
-			thermal-governor = "user_space";
-
-			trips {
-				active-config0 {
-					temperature = <65000>;
-					hysteresis = <1000>;
-					type = "passive";
-				};
-			};
-		};
-
-		pa-therm0-adc {
-			status = "disabled";
-		};
-		mdm-lowf {
-			cooling-maps {
-				cx_vdd_cdev {
-					cooling-device = <&pm8916_cx_cdev 0 0>;
-				};
-			};
-		};
-		camera-lowf {
-			cooling-maps {
-				cx_vdd_cdev {
-					cooling-device = <&pm8916_cx_cdev 0 0>;
-				};
-			};
-		};
-		gpu-lowf {
-			cooling-maps {
-				cx_vdd_cdev {
-					cooling-device = <&pm8916_cx_cdev 0 0>;
-				};
-			};
-		};
-		cpu0-2-lowf {
-			cooling-maps {
-				cx_vdd_cdev {
-					cooling-device = <&pm8916_cx_cdev 0 0>;
-				};
-			};
-		};
-		cpu1-3-lowf {
-			cooling-maps {
-				cx_vdd_cdev {
-					cooling-device = <&pm8916_cx_cdev 0 0>;
-				};
-			};
-		};
 	};
 };
 

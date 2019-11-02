@@ -1547,15 +1547,6 @@ static int qg_get_battery_capacity(struct qpnp_qg *chip, int *soc)
 	return 0;
 }
 
-static int qg_get_battery_capacity_real(struct qpnp_qg *chip, int *soc)
-{
-	mutex_lock(&chip->soc_lock);
-	*soc = chip->msoc;
-	mutex_unlock(&chip->soc_lock);
-
-	return 0;
-}
-
 static int qg_get_charge_counter(struct qpnp_qg *chip, int *charge_counter)
 {
 	int rc, cc_soc = 0;
