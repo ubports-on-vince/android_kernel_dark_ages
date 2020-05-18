@@ -973,6 +973,8 @@ static void schedtune_boostgroup_init(struct schedtune *st, int idx) {
 #ifdef CONFIG_DYNAMIC_STUNE_BOOST
   boost_slots_init(st);
 #endif // CONFIG_DYNAMIC_STUNE_BOOST
+
+  return;
 }
 
 static struct cgroup_subsys_state *
